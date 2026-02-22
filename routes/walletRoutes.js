@@ -1,26 +1,35 @@
-const walletController = require('../controllers/walletController');
+const walletController = require("../controllers/walletController");
 
 module.exports = (req, res, body) => {
-  const urlParts = req.url.split('/');
-  const id = urlParts[2];
+  const url = req.url;
+  const method = req.method;
 
-  if (req.method === 'GET' && req.url === '/wallets') {
+  if (url === "/wallets" && method === "GET") {
     return walletController.getWallets(req, res);
   }
 
-  if (req.method === 'POST' && req.url === '/wallets') {
+  if (url === "/wallets" && method === "POST") {
     return walletController.createWallet(req, res, body);
   }
 
-  if (req.method === 'POST' && urlParts[3] === 'deposit') {
-    return walletController.deposit(req, res, id, body);
-  }
+  if (url.startsWith("/wallets/")) {
+    const parts = url.split("/");
+    const id = parts[2];
 
-  if (req.method === 'POST' && urlParts[3] === 'withdraw') {
-    return walletController.withdraw(req, res, id, body);
-  }
+    if (parts.length === 3) {
+      if (method === "GET")
+        return walletController.getWalletById(req, res, id);
 
-  if (req.method === 'DELETE' && id) {
-    return walletController.deleteWallet(req, res, id);
+      if (method === "DELETE")
+        return walletController.deleteWallet(req, res, id);
+    }
+
+    if (parts[3] === "deposit" && method === "POST") {
+      return walletController.deposit(req, res, id, body);
+    }
+
+    if (parts[3] === "withdraw" && method === "POST") {
+      return walletController.withdraw(req, res, id, body);
+    }
   }
 };

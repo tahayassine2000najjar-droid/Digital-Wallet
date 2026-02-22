@@ -1,26 +1,27 @@
-const userController = require('../controllers/userController');
+const userController = require("../controllers/userController");
 
 module.exports = (req, res, body) => {
-  const urlParts = req.url.split('/');
-  const id = urlParts[2];
+  const url = req.url;
+  const method = req.method;
 
-  if (req.method === 'GET' && req.url === '/users') {
+  if (url === "/users" && method === "GET") {
     return userController.getUsers(req, res);
   }
 
-  if (req.method === 'GET' && id) {
-    return userController.getUserById(req, res, id);
-  }
-
-  if (req.method === 'POST' && req.url === '/users') {
+  if (url === "/users" && method === "POST") {
     return userController.createUser(req, res, body);
   }
 
-  if (req.method === 'PUT' && id) {
-    return userController.updateUser(req, res, id, body);
-  }
+  if (url.startsWith("/users/")) {
+    const id = url.split("/")[2];
 
-  if (req.method === 'DELETE' && id) {
-    return userController.deleteUser(req, res, id);
+    if (method === "GET")
+      return userController.getUserById(req, res, id);
+
+    if (method === "PUT")
+      return userController.updateUser(req, res, id, body);
+
+    if (method === "DELETE")
+      return userController.deleteUser(req, res, id);
   }
 };
